@@ -15,12 +15,49 @@ if "move_history" not in st.session_state:
     st.session_state.move_history = []
 if "max_turns" not in st.session_state:
     st.session_state.max_turns = 5
+if "white_level" not in st.session_state:
+    st.session_state.white_level = "Expert"
+if "black_level" not in st.session_state:
+    st.session_state.black_level = "Expert"
+
+# Custom CSS to make the selectbox containers wider
+st.markdown("""
+    <style>
+    div[data-baseweb="select"] > div {
+        min-width: 200px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Create a container for the top-right level selectors
+_, _, level_col1, level_col2 = st.columns([0.5, 0.5, 1.5, 1.5])
+
+with level_col1:
+    white_level = st.selectbox(
+        "White AI Difficulty",
+        ["Beginner (800-1200 rating)", "Intermediate (1200 rating)", "Expert (2000 rating)", "GrandMaster (2200 rating)"],
+        index=2,
+        key="white_level_select"
+    )
+    st.session_state.white_level = white_level
+
+with level_col2:
+    black_level = st.selectbox(
+        "Black AI Difficulty",
+        ["Beginner (800-1200 rating)", "Intermediate (1200 rating)", "Expert (2000 rating)", "GrandMaster (2200 rating)"],
+        index=2,
+        key="black_level_select"
+    )
+    st.session_state.black_level = black_level
+
+# Main title
+st.title("Chess with AutoGen Agents")
 
 st.sidebar.title("Chess Agent Configuration")
-openai_api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password")
-if openai_api_key:
-    st.session_state.openai_api_key = openai_api_key
-    st.sidebar.success("API key saved!")
+# openai_api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password")
+# if openai_api_key:
+#     st.session_state.openai_api_key = openai_api_key
+#     st.sidebar.success("API key saved!")
 
 st.sidebar.info("""
 For a complete chess game with potential checkmate, it would take max_turns > 200 approximately.
@@ -40,7 +77,58 @@ if max_turns_input:
     st.session_state.max_turns = max_turns_input
     st.sidebar.success(f"Max turns of total chess moves set to {st.session_state.max_turns}!")
 
-st.title("Chess with AutoGen Agents")
+# Add Coming Soon section in sidebar
+st.sidebar.markdown("---")  # Separator line
+st.sidebar.markdown("### Coming Soon")
+
+# Custom CSS for disabled buttons with hover effect
+st.markdown("""
+    <style>
+    .disabled-button {
+        background-color: #808080;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        margin: 5px 0;
+        width: 100%;
+        opacity: 0.6;
+        cursor: not-allowed !important;
+        position: relative;
+    }
+    
+    .disabled-button:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #333;
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 12px;
+        white-space: nowrap;
+        margin-left: 10px;
+        z-index: 1;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Add disabled buttons with hover tooltips
+st.sidebar.markdown("""
+    <button class="disabled-button">
+        Create Your Agent
+    </button>
+    
+    <button class="disabled-button">
+        Agent Progress Tracker
+    </button>
+    
+    <button class="disabled-button">
+        Competition Mode
+    </button>
+""", unsafe_allow_html=True)
 
 def available_moves() -> str:
     available_moves = [str(move) for move in st.session_state.board.legal_moves]
@@ -246,4 +334,4 @@ The game is managed by a **Game Master** that:
         st.error(f"An error occurred: {e}. Please check your API key and try again.")
 
 else:
-    st.warning("Please enter your OpenAI API key in the sidebar to start the game.")
+    st.warning("Please choose your ai agent ratings before starting the game.")
